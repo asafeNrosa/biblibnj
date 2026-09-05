@@ -1,0 +1,188 @@
+.login-wrapper {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+  padding: 2rem 1rem;
+
+  .login-card {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 2rem;
+
+      .brand-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+        color: #0f172a;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+      }
+
+      p {
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+    }
+
+    .alert-error {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+
+        label {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #334155;
+        }
+
+        .label-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .forgot-link {
+            font-size: 0.8rem;
+            color: #0284c7;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+
+        .input-icon-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+
+          .icon {
+            position: absolute;
+            left: 12px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+          }
+
+          input {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 2.4rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+
+            &:focus {
+              border-color: #0284c7;
+              box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+            }
+
+            &.is-invalid {
+              border-color: #ef4444;
+
+              &:focus {
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+              }
+            }
+          }
+
+          .btn-toggle-pass {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.2rem;
+            color: #64748b;
+          }
+        }
+
+        .error-feedback {
+          small {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.2rem;
+            display: block;
+          }
+        }
+      }
+
+      .btn-submit {
+        margin-top: 0.5rem;
+        background-color: #0284c7;
+        color: #ffffff;
+        border: none;
+        padding: 0.8rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background-color: #0369a1;
+        }
+
+        &:disabled {
+          background-color: #94a3b8;
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+      }
+    }
+
+    .card-footer {
+      margin-top: 2rem;
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid #f1f5f9;
+
+      p {
+        font-size: 0.85rem;
+        color: #64748b;
+
+        a {
+          color: #0284c7;
+          font-weight: 600;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}

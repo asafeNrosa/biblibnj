@@ -1,0 +1,75 @@
+<div class="waitlist-container">
+  <div class="waitlist-header">
+    <h1>Fila de Espera</h1>
+    <p>Acompanhe sua posição na fila de reservas para livros que estavam esgotados.</p>
+  </div>
+
+  <div class="summary-cards">
+    <div class="card">
+      <div class="card-icon">⏳</div>
+      <div class="card-info">
+        <h3>{{ totalReservasAtivas }}</h3>
+        <p>Reservas Ativas</p>
+      </div>
+    </div>
+
+    <div class="card card-alert" *ngIf="totalDisponiveisRetirada > 0">
+      <div class="card-icon">🎉</div>
+      <div class="card-info">
+        <h3>{{ totalDisponiveisRetirada }}</h3>
+        <p>Pronto(s) para Retirada</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="reservas.length > 0; else emptyState" class="reservas-grid">
+    <div *ngFor="let reserva of reservas" class="reserva-card" [class.ready]="reserva.status === 'DisponivelParaRetirada'">
+      <div class="card-top">
+        <span class="category-tag">{{ reserva.categoria }}</span>
+        <span class="status-badge" [class.badge-ready]="reserva.status === 'DisponivelParaRetirada'">
+          {{ reserva.status === 'DisponivelParaRetirada' ? 'Disponível para Retirada' : 'Na Fila' }}
+        </span>
+      </div>
+
+      <div class="book-info">
+        <h3>{{ reserva.tituloLivro }}</h3>
+        <p class="author">por {{ reserva.autorLivro }}</p>
+        <p class="request-date">Solicitado em: {{ reserva.dataSolicitacao | date:'dd/MM/yyyy' }}</p>
+      </div>
+
+      <div class="position-banner" *ngIf="reserva.status === 'Aguardando'">
+        <div class="pos-number">#{{ reserva.posicao }}</div>
+        <div class="pos-text">
+          <span>Sua posição atual</span>
+          <small>Total na fila: {{ reserva.totalNaFila }} leitor(es)</small>
+        </div>
+      </div>
+
+      <div class="ready-banner" *ngIf="reserva.status === 'DisponivelParaRetirada'">
+        <span>✅ Chegou a sua vez! O exemplar já está reservado no balcão.</span>
+      </div>
+
+      <div class="card-actions">
+        <button 
+          *ngIf="reserva.status === 'DisponivelParaRetirada'" 
+          (click)="confirmarEmprestimo(reserva)" 
+          class="btn-confirm">
+          Confirmar Empréstimo
+        </button>
+
+        <button (click)="cancelarReserva(reserva)" class="btn-cancel">
+          Cancelar Reserva
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <span class="empty-icon">🎟️</span>
+      <h3>Nenhuma reserva ativa</h3>
+      <p>Você não está em nenhuma fila de espera no momento.</p>
+      <a routerLink="/livros" class="btn-explore">Explorar Catálogo</a>
+    </div>
+  </ng-template>
+</div>

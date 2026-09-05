@@ -1,0 +1,289 @@
+.catalog-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+
+  .catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      color: #0f172a;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    p {
+      color: #64748b;
+      font-size: 1rem;
+    }
+
+    .btn-add-admin {
+      background-color: #16a34a;
+      color: #ffffff;
+      padding: 0.7rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #15803d;
+      }
+    }
+  }
+
+  .search-bar-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    background-color: #f8fafc;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        color: #94a3b8;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 0.7rem 2.2rem 0.7rem 2.4rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          border-color: #38bdf8;
+        }
+      }
+
+      .btn-clear {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+
+      .filter-btn {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: #f1f5f9;
+        }
+
+        &.active {
+          background-color: #0284c7;
+          color: #ffffff;
+          border-color: #0284c7;
+        }
+      }
+    }
+  }
+
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+
+    .book-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .book-cover {
+        height: 120px;
+        background-color: #f1f5f9;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .cover-icon {
+          font-size: 2.5rem;
+        }
+
+        .category-tag {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background-color: #e0f2fe;
+          color: #0369a1;
+          font-size: 0.75rem;
+          font-weight: 600;
+          padding: 0.2rem 0.6rem;
+          border-radius: 4px;
+        }
+      }
+
+      .book-details {
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 0.2rem;
+        }
+
+        .author {
+          font-size: 0.85rem;
+          color: #64748b;
+          margin-bottom: 0.4rem;
+        }
+
+        .isbn {
+          font-size: 0.75rem;
+          color: #94a3b8;
+          font-family: monospace;
+          margin-bottom: 1rem;
+        }
+
+        .stock-info {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.8rem;
+          font-weight: 600;
+          margin-top: auto;
+          margin-bottom: 1rem;
+
+          .in-stock {
+            color: #16a34a;
+          }
+
+          .out-of-stock {
+            color: #dc2626;
+          }
+
+          .total-stock {
+            color: #94a3b8;
+          }
+        }
+
+        .card-actions {
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+
+          .btn-action {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &.btn-borrow {
+              background-color: #0284c7;
+              color: #ffffff;
+
+              &:hover {
+                background-color: #0369a1;
+              }
+            }
+
+            &.btn-waitlist {
+              background-color: #d97706;
+              color: #ffffff;
+
+              &:hover {
+                background-color: #b45309;
+              }
+            }
+          }
+
+          .admin-actions {
+            display: flex;
+            gap: 0.3rem;
+
+            .btn-icon {
+              padding: 0.4rem;
+              border: 1px solid #e2e8f0;
+              border-radius: 6px;
+              background: #ffffff;
+              cursor: pointer;
+              text-decoration: none;
+              font-size: 0.85rem;
+
+              &:hover {
+                background: #f8fafc;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #64748b;
+
+    .empty-icon {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+  }
+}

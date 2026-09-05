@@ -1,0 +1,67 @@
+<div class="home-container">
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Bem-vindo à <span class="brand-text">biblibnj</span></h1>
+      <p>Explore o acervo, acompanhe seus empréstimos e reserve livros esgotados em um só lugar.</p>
+      <div class="hero-buttons">
+        <a routerLink="/livros" class="btn btn-primary">Explorar Catálogo Completo</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>Últimos Lançamentos</h2>
+      <a routerLink="/livros" class="see-more">Ver todos →</a>
+    </div>
+
+    <div class="books-grid">
+      <div *ngFor="let livro of lancamentos" class="book-card">
+        <div class="book-cover">
+          <span class="category-badge">{{ livro.categoria }}</span>
+          <div class="cover-placeholder">📖</div>
+        </div>
+        <div class="book-info">
+          <h3 class="book-title">{{ livro.titulo }}</h3>
+          <p class="book-author">{{ livro.autor }}</p>
+          <div class="book-status">
+            <span [class.available]="livro.quantidadeDisponivel > 0" [class.unavailable]="livro.quantidadeDisponivel === 0">
+              {{ livro.quantidadeDisponivel > 0 ? (livro.quantidadeDisponivel + ' disponível(is)') : 'Esgotado' }}
+            </span>
+          </div>
+          <button [routerLink]="['/livros']" class="btn-action" [class.btn-waitlist]="livro.quantidadeDisponivel === 0">
+            {{ livro.quantidadeDisponivel > 0 ? 'Emprestar' : 'Entrar na Fila' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-alt">
+    <div class="section-header">
+      <h2> Mais Populares</h2>
+      <a routerLink="/livros" class="see-more">Ver todos →</a>
+    </div>
+
+    <div class="books-grid">
+      <div *ngFor="let livro of maisEmprestados" class="book-card">
+        <div class="book-cover">
+          <span class="category-badge popular">Popular</span>
+          <div class="cover-placeholder">📚</div>
+        </div>
+        <div class="book-info">
+          <h3 class="book-title">{{ livro.titulo }}</h3>
+          <p class="book-author">{{ livro.autor }}</p>
+          <div class="book-status">
+            <span [class.available]="livro.quantidadeDisponivel > 0" [class.unavailable]="livro.quantidadeDisponivel === 0">
+              {{ livro.quantidadeDisponivel > 0 ? (livro.quantidadeDisponivel + ' disponível(is)') : 'Esgotado' }}
+            </span>
+          </div>
+          <button [routerLink]="['/livros']" class="btn-action" [class.btn-waitlist]="livro.quantidadeDisponivel === 0">
+            {{ livro.quantidadeDisponivel > 0 ? 'Emprestar' : 'Entrar na Fila' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

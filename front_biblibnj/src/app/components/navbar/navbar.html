@@ -1,0 +1,90 @@
+<header class="navbar-header">
+  <div class="navbar-container">
+    <a routerLink="/livros" class="navbar-brand" (click)="fecharMenu()">
+      <span class="brand-icon">📚</span>
+      <span class="brand-name">biblibnj</span>
+    </a>
+
+    <button 
+      class="hamburger-btn" 
+      (click)="toggleMenu()" 
+      [class.active]="menuAberto"
+      aria-label="Alternar menu de navegação">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <nav class="nav-links" [class.open]="menuAberto">
+      <a 
+        routerLink="/livros" 
+        routerLinkActive="active" 
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="fecharMenu()">
+        Catálogo
+      </a>
+
+      <ng-container *ngIf="isLoggedIn">
+        <a 
+          routerLink="/emprestimos/meus-emprestimos" 
+          routerLinkActive="active" 
+          (click)="fecharMenu()">
+          Meus Empréstimos
+        </a>
+
+        <a 
+          routerLink="/emprestimos/fila-espera" 
+          routerLinkActive="active" 
+          (click)="fecharMenu()">
+          Fila de Espera
+        </a>
+
+        <a 
+          *ngIf="isAdmin" 
+          routerLink="/admin/livros/novo" 
+          routerLinkActive="active" 
+          class="admin-link"
+          (click)="fecharMenu()">
+          + Novo Livro
+        </a>
+      </ng-container>
+
+      <div class="mobile-user-actions">
+        <ng-container *ngIf="isLoggedIn; else mobileLoggedOut">
+          <button (click)="togglePerfil()" class="btn-toggle-role">
+            Perfil: {{ isAdmin ? 'Admin' : 'Leitor' }} 🔄
+          </button>
+          <button (click)="logout()" class="btn-logout-mobile">Sair</button>
+        </ng-container>
+        <ng-template #mobileLoggedOut>
+          <a routerLink="/login" class="btn-login-mobile" (click)="fecharMenu()">Entrar</a>
+        </ng-template>
+      </div>
+    </nav>
+
+    <div class="user-actions-desktop">
+      <ng-container *ngIf="isLoggedIn; else desktopLoggedOut">
+        <button 
+          (click)="togglePerfil()" 
+          class="role-badge" 
+          [class.badge-admin]="isAdmin"
+          title="Clique para alternar o perfil de teste">
+          {{ isAdmin ? 'Modo Admin' : 'Modo Leitor' }}
+        </button>
+
+        <div class="user-profile">
+          <span class="user-avatar">👤</span>
+          <span class="user-name">{{ nomeUsuario }}</span>
+        </div>
+
+        <button (click)="logout()" class="btn-logout" title="Encerrar sessão">
+          Sair 🚪
+        </button>
+      </ng-container>
+
+      <ng-template #desktopLoggedOut>
+        <a routerLink="/login" class="btn-login">Entrar</a>
+      </ng-template>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,112 @@
+<div class="form-container">
+  <div class="form-header">
+    <a routerLink="/livros" class="btn-back">← Voltar ao Catálogo</a>
+    <h1>{{ isEdicao ? 'Editar Livro' : 'Cadastrar Novo Livro' }}</h1>
+    <p>{{ isEdicao ? 'Atualize as informações do acervo.' : 'Preencha os dados abaixo para adicionar um novo título à biblioteca.' }}</p>
+  </div>
+
+  <form [formGroup]="livroForm" (ngSubmit)="onSubmit()" class="livro-form-card">
+    
+    <div *ngIf="livroForm.errors?.['estoqueInvalido'] && (livroForm.touched || livroForm.dirty)" class="alert-warning">
+      ⚠️ A quantidade disponível não pode ser maior que a quantidade total em estoque.
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group col-span-2">
+        <label for="titulo">Título do Livro <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="titulo" 
+          formControlName="titulo" 
+          placeholder="Ex: O Senhor dos Anéis"
+          [class.is-invalid]="f['titulo'].invalid && (f['titulo'].touched || f['titulo'].dirty)"
+        />
+        <div *ngIf="f['titulo'].invalid && (f['titulo'].touched || f['titulo'].dirty)" class="error-feedback">
+          <small *ngIf="f['titulo'].errors?.['required']">O título é obrigatório.</small>
+          <small *ngIf="f['titulo'].errors?.['minlength']">O título deve ter no mínimo 2 caracteres.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="autor">Autor <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="autor" 
+          formControlName="autor" 
+          placeholder="Ex: J.R.R. Tolkien"
+          [class.is-invalid]="f['autor'].invalid && (f['autor'].touched || f['autor'].dirty)"
+        />
+        <div *ngIf="f['autor'].invalid && (f['autor'].touched || f['autor'].dirty)" class="error-feedback">
+          <small *ngIf="f['autor'].errors?.['required']">O autor é obrigatório.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="isbn">ISBN (Apenas números) <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="isbn" 
+          formControlName="isbn" 
+          placeholder="Ex: 9788595084742"
+          [class.is-invalid]="f['isbn'].invalid && (f['isbn'].touched || f['isbn'].dirty)"
+        />
+        <div *ngIf="f['isbn'].invalid && (f['isbn'].touched || f['isbn'].dirty)" class="error-feedback">
+          <small *ngIf="f['isbn'].errors?.['required']">O ISBN é obrigatório.</small>
+          <small *ngIf="f['isbn'].errors?.['pattern']">Informe um ISBN válido (10 ou 13 dígitos numéricos).</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoria">Categoria <span class="required">*</span></label>
+        <select 
+          id="categoria" 
+          formControlName="categoria"
+          [class.is-invalid]="f['categoria'].invalid && (f['categoria'].touched || f['categoria'].dirty)">
+          <option value="" disabled>Selecione uma categoria...</option>
+          <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+        </select>
+        <div *ngIf="f['categoria'].invalid && (f['categoria'].touched || f['categoria'].dirty)" class="error-feedback">
+          <small *ngIf="f['categoria'].errors?.['required']">A categoria é obrigatória.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="quantidadeTotal">Quantidade Total <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="quantidadeTotal" 
+          formControlName="quantidadeTotal" 
+          min="1"
+          [class.is-invalid]="f['quantidadeTotal'].invalid && (f['quantidadeTotal'].touched || f['quantidadeTotal'].dirty)"
+        />
+        <div *ngIf="f['quantidadeTotal'].invalid && (f['quantidadeTotal'].touched || f['quantidadeTotal'].dirty)" class="error-feedback">
+          <small *ngIf="f['quantidadeTotal'].errors?.['required']">Informe a quantidade total.</small>
+          <small *ngIf="f['quantidadeTotal'].errors?.['min']">Deve ser no mínimo 1 exemplar.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="quantidadeDisponivel">Quantidade Disponível <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="quantidadeDisponivel" 
+          formControlName="quantidadeDisponivel" 
+          min="0"
+          [class.is-invalid]="f['quantidadeDisponivel'].invalid && (f['quantidadeDisponivel'].touched || f['quantidadeDisponivel'].dirty)"
+        />
+        <div *ngIf="f['quantidadeDisponivel'].invalid && (f['quantidadeDisponivel'].touched || f['quantidadeDisponivel'].dirty)" class="error-feedback">
+          <small *ngIf="f['quantidadeDisponivel'].errors?.['required']">Informe a quantidade disponível.</small>
+          <small *ngIf="f['quantidadeDisponivel'].errors?.['min']">Não pode ser menor que 0.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a routerLink="/livros" class="btn-cancel">Cancelar</a>
+      <button type="submit" [disabled]="livroForm.invalid || carregando" class="btn-submit">
+        <span *ngIf="!carregando">{{ isEdicao ? 'Salvar Alterações' : 'Cadastrar Livro' }}</span>
+        <span *ngIf="carregando">Processando...</span>
+      </button>
+    </div>
+  </form>
+</div>

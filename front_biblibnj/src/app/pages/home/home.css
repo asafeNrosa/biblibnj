@@ -1,0 +1,197 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #ffffff;
+    padding: 3rem 2rem;
+    border-radius: 12px;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .hero-content {
+      max-width: 600px;
+
+      h1 {
+        font-size: 2.2rem;
+        margin-bottom: 0.8rem;
+        font-weight: 700;
+
+        .brand-text {
+          color: #38bdf8;
+        }
+      }
+
+      p {
+        font-size: 1.1rem;
+        color: #94a3b8;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+      }
+
+      .btn-primary {
+        background-color: #38bdf8;
+        color: #0f172a;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: #0ea5e9;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+
+  .section {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+
+    &.bg-alt {
+      background-color: #f8fafc;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+
+      h2 {
+        font-size: 1.4rem;
+        color: #1e293b;
+        font-weight: 700;
+      }
+
+      .see-more {
+        color: #0284c7;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+
+    .book-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .book-cover {
+        height: 140px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        .cover-placeholder {
+          font-size: 2.5rem;
+        }
+
+        .category-badge {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          background-color: #e0f2fe;
+          color: #0369a1;
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 0.2rem 0.5rem;
+          border-radius: 4px;
+
+          &.popular {
+            background-color: #fef3c7;
+            color: #b45309;
+          }
+        }
+      }
+
+      .book-info {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .book-title {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #0f172a;
+          margin-bottom: 0.2rem;
+          line-height: 1.3;
+        }
+
+        .book-author {
+          font-size: 0.85rem;
+          color: #64748b;
+          margin-bottom: 0.8rem;
+        }
+
+        .book-status {
+          margin-top: auto;
+          margin-bottom: 0.8rem;
+          font-size: 0.8rem;
+          font-weight: 600;
+
+          .available {
+            color: #16a34a;
+          }
+
+          .unavailable {
+            color: #dc2626;
+          }
+        }
+
+        .btn-action {
+          width: 100%;
+          padding: 0.5rem;
+          border: none;
+          border-radius: 6px;
+          background-color: #0284c7;
+          color: #ffffff;
+          font-weight: 600;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #0369a1;
+          }
+
+          &.btn-waitlist {
+            background-color: #d97706;
+
+            &:hover {
+              background-color: #b45309;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+<div class="loans-container">
+  <div class="loans-header">
+    <h1>Meus Empréstimos</h1>
+    <p>Acompanhe o status e prazos de devolução dos seus livros.</p>
+  </div>
+
+  <div class="summary-cards">
+    <div class="card card-active">
+      <div class="card-icon">📖</div>
+      <div class="card-info">
+        <h3>{{ emprestimosEmAberto.length }}</h3>
+        <p>Livros em Aberto</p>
+      </div>
+    </div>
+    <div class="card card-late" *ngIf="totalAtrasados > 0">
+      <div class="card-icon">⚠️</div>
+      <div class="card-info">
+        <h3>{{ totalAtrasados }}</h3>
+        <p>Livros Atrasados</p>
+      </div>
+    </div>
+    <a routerLink="/livros" class="btn btn-primary add-loan-btn">+ Novo Empréstimo</a>
+  </div>
+
+  <div *ngIf="meusEmprestimos.length > 0; else noLoans" class="loans-list-wrapper">
+    <table class="loans-table">
+      <thead>
+        <tr>
+          <th>Livro</th>
+          <th>Data Empréstimo</th>
+          <th>Prazo Devolução</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emprestimo of meusEmprestimos">
+
+          <td class="col-book">
+            <div class="book-info">
+              <span class="book-icon">📘</span>
+              <div>
+                <strong>{{ emprestimo.tituloLivro }}</strong>
+                <small>{{ emprestimo.autorLivro }}</small>
+              </div>
+            </div>
+          </td>
+
+          <td class="col-date">{{ emprestimo.dataEmprestimo | date:'dd/MM/yyyy' }}</td>
+          <td class="col-date">{{ emprestimo.dataPrevisaoDevolucao | date:'dd/MM/yyyy' }}</td>
+
+          <td class="col-status">
+            <span class="status-badge" [ngClass]="calcularStatus(emprestimo).class">
+              {{ calcularStatus(emprestimo).text }}
+            </span>
+            <small *ngIf="emprestimo.dataDevolucaoEfetiva" class="return-date">
+              Devolvido em: {{ emprestimo.dataDevolucaoEfetiva | date:'dd/MM/yyyy' }}
+            </small>
+          </td>
+
+          <td class="col-actions">
+            <button 
+              *ngIf="!emprestimo.dataDevolucaoEfetiva"
+              (click)="devolverLivro(emprestimo.id)" 
+              class="btn-devolver"
+              title="Solicitar Devolução">
+              Devolver
+            </button>
+            <span *ngIf="emprestimo.dataDevolucaoEfetiva" class="check-icon">✓</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noLoans>
+    <div class="empty-state">
+      <span class="empty-icon">📚</span>
+      <h3>Nenhum empréstimo realizado</h3>
+      <p>Você ainda não pegou nenhum livro emprestado na nossa biblioteca.</p>
+      <a routerLink="/livros" class="btn btn-primary">Explorar Catálogo</a>
+    </div>
+  </ng-template>
+</div>

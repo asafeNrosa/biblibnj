@@ -1,0 +1,95 @@
+<div class="catalog-container">
+  <div class="catalog-header">
+    <div>
+      <h1>Catálogo Completo</h1>
+      <p>Explore todos os livros disponíveis na biblioteca <strong>biblibnj</strong>.</p>
+    </div>
+
+    <a *ngIf="isAdmin" routerLink="/admin/livros/novo" class="btn-add-admin">
+      <span>+</span> Novo Livro
+    </a>
+  </div>
+
+  <div class="search-bar-container">
+    <div class="search-input-wrapper">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        [(ngModel)]="termoBusca" 
+        placeholder="Buscar por título, autor ou ISBN..." 
+        class="search-input"
+      />
+      <button *ngIf="termoBusca" (click)="termoBusca = ''" class="btn-clear">✕</button>
+    </div>
+
+    <div class="filter-buttons">
+      <button 
+        [class.active]="filtroStatus === 'todos'" 
+        (click)="filtroStatus = 'todos'" 
+        class="filter-btn">
+        Todos ({{ livros.length }})
+      </button>
+      <button 
+        [class.active]="filtroStatus === 'disponiveis'" 
+        (click)="filtroStatus = 'disponiveis'" 
+        class="filter-btn">
+        Disponíveis
+      </button>
+      <button 
+        [class.active]="filtroStatus === 'esgotados'" 
+        (click)="filtroStatus = 'esgotados'" 
+        class="filter-btn">
+        Esgotados
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="livrosFiltrados.length > 0; else noResults" class="books-grid">
+    <div *ngFor="let livro of livrosFiltrados" class="book-card">
+      <div class="book-cover">
+        <span class="category-tag">{{ livro.categoria }}</span>
+        <div class="cover-icon">📘</div>
+      </div>
+
+      <div class="book-details">
+        <h3 class="title">{{ livro.titulo }}</h3>
+        <p class="author">por {{ livro.autor }}</p>
+        <p class="isbn">ISBN: {{ livro.isbn }}</p>
+
+        <div class="stock-info">
+          <span [class.in-stock]="livro.quantidadeDisponivel > 0" [class.out-of-stock]="livro.quantidadeDisponivel === 0">
+            ● {{ livro.quantidadeDisponivel > 0 ? (livro.quantidadeDisponivel + ' disponível(is)') : 'Esgotado' }}
+          </span>
+          <span class="total-stock">Total: {{ livro.quantidadeTotal }}</span>
+        </div>
+
+        <div class="card-actions">
+          <ng-container *ngIf="livro.quantidadeDisponivel > 0; else btnFila">
+            <button (click)="solicitarEmprestimo(livro)" class="btn-action btn-borrow">
+              Emprestar
+            </button>
+          </ng-container>
+
+          <ng-template #btnFila>
+            <button (click)="entrarNaFila(livro)" class="btn-action btn-waitlist">
+              Entrar na Fila
+            </button>
+          </ng-template>
+
+          <div *ngIf="isAdmin" class="admin-actions">
+            <a [routerLink]="['/admin/livros/editar', livro.id]" class="btn-icon edit" title="Editar Livro">✏️</a>
+            <button (click)="excluirLivro(livro.id)" class="btn-icon delete" title="Excluir Livro">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noResults>
+    <div class="empty-state">
+      <span class="empty-icon">🔎</span>
+      <h3>Nenhum livro encontrado</h3>
+      <p>Tente ajustar os termos de pesquisa ou o filtro selecionado.</p>
+    </div>
+  </ng-template>
+</div>

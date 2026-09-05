@@ -1,0 +1,66 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="brand-header">
+      <div class="brand-icon">📚</div>
+      <h2>biblibnj</h2>
+      <p>Acesse sua conta para consultar e solicitar livros</p>
+    </div>
+
+    <div *ngIf="mensagemErro" class="alert-error">
+      <span>⚠️</span> {{ mensagemErro }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <div class="input-icon-wrapper">
+          <span class="icon">✉️</span>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="seu.email@exemplo.com"
+            [class.is-invalid]="email?.invalid && (email?.touched || email?.dirty)"
+          />
+        </div>
+        <div *ngIf="email?.invalid && (email?.touched || email?.dirty)" class="error-feedback">
+          <small *ngIf="email?.errors?.['required']">O e-mail é obrigatório.</small>
+          <small *ngIf="email?.errors?.['email']">Digite um endereço de e-mail válido.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label-row">
+          <label for="senha">Senha</label>
+          <a routerLink="/esqueci-senha" class="forgot-link">Esqueceu a senha?</a>
+        </div>
+        <div class="input-icon-wrapper">
+          <span class="icon">🔒</span>
+          <input 
+            [type]="exibirSenha ? 'text' : 'password'" 
+            id="senha" 
+            formControlName="senha" 
+            placeholder="Sua senha secreta"
+            [class.is-invalid]="senha?.invalid && (senha?.touched || senha?.dirty)"
+          />
+          <button type="button" (click)="toggleMostrarSenha()" class="btn-toggle-pass">
+            {{ exibirSenha ? '👁️‍🗨️' : '👁️' }}
+          </button>
+        </div>
+        <div *ngIf="senha?.invalid && (senha?.touched || senha?.dirty)" class="error-feedback">
+          <small *ngIf="senha?.errors?.['required']">A senha é obrigatória.</small>
+          <small *ngIf="senha?.errors?.['minlength']">A senha deve ter no mínimo 6 caracteres.</small>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid || carregando" class="btn-submit">
+        <span *ngIf="!carregando">Entrar na Conta</span>
+        <span *ngIf="carregando">Autenticando...</span>
+      </button>
+    </form>
+
+    <div class="card-footer">
+      <p>Ainda não possui uma conta? <a routerLink="/cadastro">Cadastre-se</a></p>
+    </div>
+  </div>
+</div>
