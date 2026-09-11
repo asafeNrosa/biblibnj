@@ -150,34 +150,6 @@ namespace biblibnj.Controllers
             return Ok(new { mensagem = "Senha alterada com sucesso." });
         }
 
-        // ENDPOINT TEMPORÁRIO DE MIGRAÇÃO — use uma única vez para converter
-        // as senhas antigas (salvas em texto puro, de antes do hash existir)
-        // para o formato criptografado, sem precisar saber a senha de ninguém.
-        // Depois de rodar uma vez com sucesso, remova este endpoint do projeto.
-        [HttpPost("migrar-senhas-legadas")]
-        [AllowAnonymous]
-        public async Task<IActionResult> MigrarSenhasLegadas()
-        {
-            var usuarios = await _context.Usuarios.ToListAsync();
-            int migrados = 0;
-
-            foreach (var usuario in usuarios)
-            {
-                if (!_passwordHasher.EstaEmFormatoDeHash(usuario.SenhaHash))
-                {
-                    usuario.SenhaHash = _passwordHasher.HashPassword(usuario.SenhaHash);
-                    migrados++;
-                }
-            }
-
-            if (migrados > 0)
-            {
-                await _context.SaveChangesAsync();
-            }
-
-            return Ok(new { mensagem = $"{migrados} senha(s) migrada(s) para o formato criptografado.", totalUsuarios = usuarios.Count });
-        }
-
         private static string GerarSenhaTemporaria()
         {
             const string caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
