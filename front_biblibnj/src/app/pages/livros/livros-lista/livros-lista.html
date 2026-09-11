@@ -5,7 +5,7 @@
       <p>Explore todos os livros disponíveis na biblioteca <strong>biblibnj</strong>.</p>
     </div>
 
-    <a *ngIf="isAdmin" routerLink="/admin/livros/novo" class="btn-add-admin">
+    <a *ngIf="authService.isAdmin()" routerLink="/admin/livros/novo" class="btn-add-admin">
       <span>+</span> Novo Livro
     </a>
   </div>
@@ -27,7 +27,8 @@
         [class.active]="filtroStatus === 'todos'" 
         (click)="filtroStatus = 'todos'" 
         class="filter-btn">
-        Todos ({{ livros.length }})
+        <!-- Corrigido: livros().length -->
+        Todos ({{ livros().length }})
       </button>
       <button 
         [class.active]="filtroStatus === 'disponiveis'" 
@@ -44,10 +45,18 @@
     </div>
   </div>
 
-  <div *ngIf="livrosFiltrados.length > 0; else noResults" class="books-grid">
+  <div *ngIf="carregando()" class="loading-state">
+    <p>Carregando livros...</p>
+  </div>
+
+  <div *ngIf="erroMsg()" class="alert-error">
+    {{ erroMsg() }}
+  </div>
+
+  <div *ngIf="!carregando() && livrosFiltrados.length > 0; else noResults" class="books-grid">
     <div *ngFor="let livro of livrosFiltrados" class="book-card">
       <div class="book-cover">
-        <span class="category-tag">{{ livro.categoria }}</span>
+        <span class="category-tag">{{ livro.editora }}</span>
         <div class="cover-icon">📘</div>
       </div>
 
@@ -64,21 +73,23 @@
         </div>
 
         <div class="card-actions">
-          <ng-container *ngIf="livro.quantidadeDisponivel > 0; else btnFila">
-            <button (click)="solicitarEmprestimo(livro)" class="btn-action btn-borrow">
-              Emprestar
-            </button>
+          <ng-container *ngIf="!authService.isAdmin()">
+            <ng-container *ngIf="livro.quantidadeDisponivel > 0; else btnFila">
+              <button (click)="solicitarEmprestimo(livro)" class="btn-action btn-borrow">
+                Emprestar
+              </button>
+            </ng-container>
+
+            <ng-template #btnFila>
+              <button (click)="entrarNaFila(livro)" class="btn-action btn-waitlist">
+                Entrar na Fila
+              </button>
+            </ng-template>
           </ng-container>
 
-          <ng-template #btnFila>
-            <button (click)="entrarNaFila(livro)" class="btn-action btn-waitlist">
-              Entrar na Fila
-            </button>
-          </ng-template>
-
-          <div *ngIf="isAdmin" class="admin-actions">
+          <div *ngIf="authService.isAdmin()" class="admin-actions">
             <a [routerLink]="['/admin/livros/editar', livro.id]" class="btn-icon edit" title="Editar Livro">✏️</a>
-            <button (click)="excluirLivro(livro.id)" class="btn-icon delete" title="Excluir Livro">🗑️</button>
+            <button (click)="excluirLivro(livro.id, livro.titulo)" class="btn-icon delete" title="Excluir Livro">🗑️</button>
           </div>
         </div>
       </div>
@@ -86,7 +97,7 @@
   </div>
 
   <ng-template #noResults>
-    <div class="empty-state">
+    <div *ngIf="!carregando() && !erroMsg()" class="empty-state">
       <span class="empty-icon">🔎</span>
       <h3>Nenhum livro encontrado</h3>
       <p>Tente ajustar os termos de pesquisa ou o filtro selecionado.</p>

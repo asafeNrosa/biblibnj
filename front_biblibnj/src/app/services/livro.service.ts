@@ -2,46 +2,70 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface Livro {
-  id?: number;
+export interface LivroReadDto {
+  id: number;
   titulo: string;
   autor: string;
   isbn: string;
-  categoria: string;
+  editora: string;
   anoPublicacao: number;
-  exemplaresDisponiveis: number;
-  capaUrl?: string;
+  quantidadeTotal: number;
+  quantidadeDisponivel: number;
+}
+
+export interface LivroCreateDto {
+  titulo: string;
+  autor: string;
+  isbn: string;
+  editora: string;
+  anoPublicacao: number;
+  quantidadeTotal: number;
+}
+
+export interface LivroUpdateDto {
+  titulo: string;
+  autor: string;
+  editora: string;
+  anoPublicacao: number;
+}
+
+export interface AjusteEstoqueDto {
+  novaQuantidadeTotal: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class LivroService {
-  private apiUrl = 'https://localhost:7123/api/livros';
+  private apiUrl = 'https://localhost:7206/api/livros';
 
   constructor(private http: HttpClient) {}
 
-  obterTodos(termoBusca?: string, categoria?: string): Observable<Livro[]> {
+  obterTodos(busca?: string): Observable<LivroReadDto[]> {
     let params = new HttpParams();
-    if (termoBusca) params = params.set('busca', termoBusca);
-    if (categoria) params = params.set('categoria', categoria);
+    if (busca) params = params.set('busca', busca);
 
-    return this.http.get<Livro[]>(this.apiUrl, { params });
+    return this.http.get<LivroReadDto[]>(this.apiUrl, { params });
   }
 
-  obterPorId(id: number): Observable<Livro> {
-    return this.http.get<Livro>(`${this.apiUrl}/${id}`);
+  obterPorId(id: number): Observable<LivroReadDto> {
+    return this.http.get<LivroReadDto>(`${this.apiUrl}/${id}`);
   }
 
-  criar(livro: Livro): Observable<Livro> {
-    return this.http.post<Livro>(this.apiUrl, livro);
+  cadastrar(livro: LivroCreateDto): Observable<LivroReadDto> {
+    return this.http.post<LivroReadDto>(this.apiUrl, livro);
   }
 
-  atualizar(id: number, livro: Livro): Observable<void> {
+  atualizar(id: number, livro: LivroUpdateDto): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, livro);
   }
 
-  excluir(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  ajustarEstoque(id: number, novaQuantidadeTotal: number): Observable<any> {
+    const dto: AjusteEstoqueDto = { novaQuantidadeTotal };
+    return this.http.patch<any>(`${this.apiUrl}/${id}/estoque`, dto);
   }
+
+  excluir(id: number): Observable<{ mensagem: string }> {
+    return this.http.delete<{ mensagem: string }>(`${this.apiUrl}/${id}`);
+}
 }

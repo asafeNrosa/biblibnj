@@ -6,9 +6,6 @@ namespace biblibnj.DTOs
     {
         [Required]
         public int LivroId { get; set; }
-
-        [Required]
-        public int UsuarioId { get; set; }
     }
 
     public class EmprestimoReadDto
@@ -17,9 +14,20 @@ namespace biblibnj.DTOs
         public int LivroId { get; set; }
         public string TituloLivro { get; set; } = string.Empty;
         public string ISBNLivro { get; set; } = string.Empty;
+        public int UsuarioId { get; set; }
+        public string NomeUsuario { get; set; } = string.Empty;
+        public string EmailUsuario { get; set; } = string.Empty;
         public DateTime DataEmprestimo { get; set; }
         public DateTime DataDevolucaoPrevista { get; set; }
         public DateTime? DataDevolucaoReal { get; set; }
+        public int RenovacoesRealizadas { get; set; }
         public string Status { get; set; } = string.Empty;
+        public decimal MultaEstimada { get; set; }
+    }
+
+    public class LiberarUsuarioDto
+    {
+        [Required]
+        public int UsuarioId { get; set; }
     }
 }

@@ -1,1 +1,127 @@
-<p>gerenciar-emprestimos works!</p>
+<div class="manage-container">
+  <div class="manage-header">
+    <h1>Gerenciar Empréstimos</h1>
+    <p>Aprove solicitações, acompanhe empréstimos ativos e libere usuários com multa quitada.</p>
+  </div>
+
+  <div *ngIf="erroMsg()" class="alert-error">{{ erroMsg() }}</div>
+
+  <div class="tabs">
+    <button [class.active]="abaAtiva() === 'pendentes'" (click)="abaAtiva.set('pendentes')">
+      Pendentes ({{ pendentes().length }})
+    </button>
+    <button [class.active]="abaAtiva() === 'ativos'" (click)="abaAtiva.set('ativos')">
+      Empréstimos Ativos ({{ ativos().length }})
+    </button>
+    <button [class.active]="abaAtiva() === 'multas'" (click)="abaAtiva.set('multas')">
+      Usuários com Multa ({{ usuariosComMulta().length }})
+    </button>
+  </div>
+
+  <div *ngIf="carregando()" class="loading-state">
+    <p>Carregando...</p>
+  </div>
+
+  <!-- ABA: Pendentes -->
+  <div *ngIf="!carregando() && abaAtiva() === 'pendentes'">
+    <div *ngIf="pendentes().length === 0" class="empty-state">
+      <p>Nenhuma solicitação de empréstimo aguardando aprovação.</p>
+    </div>
+
+    <table *ngIf="pendentes().length > 0" class="manage-table">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Livro</th>
+          <th>Solicitado em</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of pendentes()">
+          <td>
+            <strong>{{ e.nomeUsuario }}</strong>
+            <small>{{ e.emailUsuario }}</small>
+          </td>
+          <td>{{ e.tituloLivro }}</td>
+          <td>{{ e.dataEmprestimo | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="col-actions">
+            <button class="btn-approve" (click)="aprovar(e.id)">Aprovar</button>
+            <button class="btn-reject" (click)="vetar(e.id)">Vetar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ABA: Ativos -->
+  <div *ngIf="!carregando() && abaAtiva() === 'ativos'">
+    <div *ngIf="ativos().length === 0" class="empty-state">
+      <p>Nenhum empréstimo ativo no momento.</p>
+    </div>
+
+    <table *ngIf="ativos().length > 0" class="manage-table">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Livro</th>
+          <th>Empréstimo</th>
+          <th>Prazo</th>
+          <th>Renovações</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of ativos()">
+          <td>
+            <strong>{{ e.nomeUsuario }}</strong>
+            <small>{{ e.emailUsuario }}</small>
+          </td>
+          <td>{{ e.tituloLivro }}</td>
+          <td>{{ e.dataEmprestimo | date:'dd/MM/yyyy' }}</td>
+          <td>{{ e.dataDevolucaoPrevista | date:'dd/MM/yyyy' }}</td>
+          <td>{{ e.renovacoesRealizadas }} / 2</td>
+          <td>
+            <span class="status-badge" [ngClass]="statusClass(e.status)">{{ e.status }}</span>
+            <small *ngIf="e.status === 'Atrasado'" class="multa-hint">
+              R$ {{ e.multaEstimada.toFixed(2) }}
+            </small>
+          </td>
+          <td class="col-actions">
+            <button class="btn-devolver" (click)="devolver(e.id)">Registrar Devolução</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ABA: Multas -->
+  <div *ngIf="!carregando() && abaAtiva() === 'multas'">
+    <div *ngIf="usuariosComMulta().length === 0" class="empty-state">
+      <p>Nenhum usuário com multa pendente.</p>
+    </div>
+
+    <table *ngIf="usuariosComMulta().length > 0" class="manage-table">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Multa Pendente</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of usuariosComMulta()">
+          <td>
+            <strong>{{ u.nome }}</strong>
+            <small>{{ u.email }}</small>
+          </td>
+          <td class="multa-valor">R$ {{ u.multaPendente.toFixed(2) }}</td>
+          <td class="col-actions">
+            <button class="btn-approve" (click)="liberarUsuario(u.id, u.nome)">Liberar (multa paga)</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

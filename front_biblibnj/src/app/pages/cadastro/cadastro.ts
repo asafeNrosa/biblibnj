@@ -5,14 +5,14 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-cadastro',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './login.html',
-  styleUrl: './login.css'
+  templateUrl: './cadastro.html',
+  styleUrl: './cadastro.css'
 })
-export class LoginComponent {
-  loginForm: FormGroup;
+export class CadastroComponent {
+  cadastroForm: FormGroup;
   exibirSenha: boolean = false;
   mensagemErro: string = '';
   carregando: boolean = false;
@@ -22,18 +22,20 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
-    this.loginForm = this.fb.group({
+    this.cadastroForm = this.fb.group({
+      nome: ['', [Validators.required, Validators.maxLength(150)]],
       email: ['', [Validators.required, Validators.email]],
-      senha: ['', [Validators.required, Validators.minLength(6)]]
+      senha: ['', [Validators.required, Validators.minLength(6)]],
+      telefone: ['', [Validators.required]],
+      rua: ['', [Validators.required]],
+      numero: ['', [Validators.required]],
+      cidade: ['', [Validators.required]],
+      cep: ['', [Validators.required]]
     });
   }
 
-  get email() {
-    return this.loginForm.get('email');
-  }
-
-  get senha() {
-    return this.loginForm.get('senha');
+  get f() {
+    return this.cadastroForm.controls;
   }
 
   toggleMostrarSenha(): void {
@@ -43,21 +45,21 @@ export class LoginComponent {
   onSubmit(): void {
     this.mensagemErro = '';
 
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+    if (this.cadastroForm.invalid) {
+      this.cadastroForm.markAllAsTouched();
       return;
     }
 
     this.carregando = true;
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (res) => {
+    this.authService.cadastrar(this.cadastroForm.value).subscribe({
+      next: () => {
         this.carregando = false;
         this.router.navigate(['/livros']);
       },
       error: (err) => {
         this.carregando = false;
-        this.mensagemErro = err.error?.mensagem || 'Falha ao realizar login. Verifique suas credenciais.';
+        this.mensagemErro = err.error?.mensagem || 'Não foi possível concluir o cadastro. Tente novamente.';
       }
     });
   }

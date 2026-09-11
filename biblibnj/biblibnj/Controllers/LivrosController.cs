@@ -165,5 +165,43 @@ namespace biblibnj.Controllers
                 quantidadeDisponivel = livro.QuantidadeDisponivel
             });
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ExcluirLivro(int id)
+        {
+            var livro = await _context.Livros.FindAsync(id);
+
+            if (livro == null)
+            {
+                return NotFound(new { mensagem = "Livro não encontrado para exclusão." });
+            }
+
+            var possuiEmprestimosAtivos = await _context.Emprestimos
+                .AnyAsync(e => e.LivroId == id && e.Status == "EmAberto");
+
+            if (possuiEmprestimosAtivos)
+            {
+                return BadRequest(new
+                {
+                    mensagem = "Não é possível excluir o livro pois existem exemplares atualmente emprestados."
+                });
+            }
+
+            var registrosFila = await _context.FilaEspera
+                .Where(f => f.LivroId == id)
+                .ToListAsync();
+
+            if (registrosFila.Any())
+            {
+                _context.FilaEspera.RemoveRange(registrosFila);
+            }
+
+            _context.Livros.Remove(livro);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { mensagem = $"Livro '{livro.Titulo}' excluído com sucesso." });
+        }
     }
 }

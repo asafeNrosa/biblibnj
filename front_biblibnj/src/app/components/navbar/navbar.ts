@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,13 +11,11 @@ import { RouterLink, RouterLinkActive, Router } from '@angular/router';
   styleUrl: './navbar.css'
 })
 export class Navbar {
-  isLoggedIn: boolean = true;
-  isAdmin: boolean = true;
+  authService = inject(AuthService);
+  private router = inject(Router);
+
   menuAberto: boolean = false;
 
-  nomeUsuario: string = 'Carlos Silva';
-
-  constructor(private router: Router) {}
 
   toggleMenu(): void {
     this.menuAberto = !this.menuAberto;
@@ -26,17 +25,10 @@ export class Navbar {
     this.menuAberto = false;
   }
 
-  togglePerfil(): void {
-    this.isAdmin = !this.isAdmin;
-  }
-
   logout(): void {
-    this.isLoggedIn = false;
+    this.authService.logout();
     this.fecharMenu();
     this.router.navigate(['/login']);
   }
 
-  login(): void {
-    this.router.navigate(['/login']);
-  }
 }

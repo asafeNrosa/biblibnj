@@ -1,5 +1,6 @@
 <header class="navbar-header">
   <div class="navbar-container">
+
     <a routerLink="/livros" class="navbar-brand" (click)="fecharMenu()">
       <span class="brand-icon">📚</span>
       <span class="brand-name">biblibnj</span>
@@ -24,36 +25,46 @@
         Catálogo
       </a>
 
-      <ng-container *ngIf="isLoggedIn">
-        <a 
-          routerLink="/emprestimos/meus-emprestimos" 
-          routerLinkActive="active" 
-          (click)="fecharMenu()">
-          Meus Empréstimos
-        </a>
+      <ng-container *ngIf="authService.isLoggedIn()">
+        <ng-container *ngIf="!authService.isAdmin()">
+          <a 
+            routerLink="/emprestimos/meus-emprestimos" 
+            routerLinkActive="active" 
+            (click)="fecharMenu()">
+            Meus Empréstimos
+          </a>
 
-        <a 
-          routerLink="/emprestimos/fila-espera" 
-          routerLinkActive="active" 
-          (click)="fecharMenu()">
-          Fila de Espera
-        </a>
+          <a 
+            routerLink="/emprestimos/fila-espera" 
+            routerLinkActive="active" 
+            (click)="fecharMenu()">
+            Fila de Espera
+          </a>
+        </ng-container>
 
-        <a 
-          *ngIf="isAdmin" 
-          routerLink="/admin/livros/novo" 
-          routerLinkActive="active" 
-          class="admin-link"
-          (click)="fecharMenu()">
-          + Novo Livro
-        </a>
+        <ng-container *ngIf="authService.isAdmin()">
+          <a 
+            routerLink="/admin/gerenciar-emprestimos" 
+            routerLinkActive="active" 
+            class="admin-link"
+            (click)="fecharMenu()">
+            Gerenciar Empréstimos
+          </a>
+
+          <a 
+            routerLink="/admin/livros/novo" 
+            routerLinkActive="active" 
+            class="admin-link"
+            (click)="fecharMenu()">
+             Novo Livro
+          </a>
+        </ng-container>
       </ng-container>
 
       <div class="mobile-user-actions">
-        <ng-container *ngIf="isLoggedIn; else mobileLoggedOut">
-          <button (click)="togglePerfil()" class="btn-toggle-role">
-            Perfil: {{ isAdmin ? 'Admin' : 'Leitor' }} 🔄
-          </button>
+        <ng-container *ngIf="authService.isLoggedIn(); else mobileLoggedOut">
+          <span class="mobile-user-name">👤 {{ authService.usuarioAtual() }}</span>
+          <a routerLink="/conta/alterar-senha" class="mobile-change-pass" (click)="fecharMenu()">Alterar Senha</a>
           <button (click)="logout()" class="btn-logout-mobile">Sair</button>
         </ng-container>
         <ng-template #mobileLoggedOut>
@@ -63,19 +74,19 @@
     </nav>
 
     <div class="user-actions-desktop">
-      <ng-container *ngIf="isLoggedIn; else desktopLoggedOut">
-        <button 
-          (click)="togglePerfil()" 
+      <ng-container *ngIf="authService.isLoggedIn(); else desktopLoggedOut">
+        <span 
           class="role-badge" 
-          [class.badge-admin]="isAdmin"
-          title="Clique para alternar o perfil de teste">
-          {{ isAdmin ? 'Modo Admin' : 'Modo Leitor' }}
-        </button>
+          [class.badge-admin]="authService.isAdmin()">
+          {{ authService.isAdmin() ? 'Admin' : 'Leitor' }}
+        </span>
 
         <div class="user-profile">
           <span class="user-avatar">👤</span>
-          <span class="user-name">{{ nomeUsuario }}</span>
+          <span class="user-name">{{ authService.usuarioAtual() }}</span>
         </div>
+
+        <a routerLink="/conta/alterar-senha" class="btn-change-pass" title="Alterar senha">🔑</a>
 
         <button (click)="logout()" class="btn-logout" title="Encerrar sessão">
           Sair 🚪

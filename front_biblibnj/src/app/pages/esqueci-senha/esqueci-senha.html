@@ -1,0 +1,52 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="brand-header">
+      <div class="brand-icon">🔑</div>
+      <h2>Esqueceu a senha?</h2>
+      <p>Informe seu e-mail ou telefone cadastrado para recuperar sua senha.</p>
+    </div>
+
+    <div *ngIf="mensagemErro" class="alert-error">
+      <span>⚠️</span> {{ mensagemErro }}
+    </div>
+
+    <div *ngIf="resultado" class="alert-success">
+      <p>{{ resultado.mensagem }}</p>
+      <div class="simulacao-box">
+        <span class="simulacao-tag">Simulação de {{ resultado.canalSimulado === 'email' ? 'E-mail' : 'SMS' }}</span>
+        <p>{{ resultado.conteudoSimulado }}</p>
+      </div>
+      <small class="simulacao-nota">
+        Este é um ambiente de demonstração: nenhuma mensagem real foi enviada.
+      </small>
+    </div>
+
+    <form *ngIf="!resultado" [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="emailOuTelefone">E-mail ou telefone</label>
+        <div class="input-icon-wrapper">
+          <span class="icon">✉️</span>
+          <input 
+            type="text" 
+            id="emailOuTelefone" 
+            formControlName="emailOuTelefone" 
+            placeholder="seu.email@exemplo.com ou telefone"
+            [class.is-invalid]="emailOuTelefone?.invalid && (emailOuTelefone?.touched || emailOuTelefone?.dirty)"
+          />
+        </div>
+        <div *ngIf="emailOuTelefone?.invalid && (emailOuTelefone?.touched || emailOuTelefone?.dirty)" class="error-feedback">
+          <small *ngIf="emailOuTelefone?.errors?.['required']">Informe seu e-mail ou telefone.</small>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="form.invalid || carregando" class="btn-submit">
+        <span *ngIf="!carregando">Recuperar Senha</span>
+        <span *ngIf="carregando">Buscando...</span>
+      </button>
+    </form>
+
+    <div class="card-footer">
+      <p><a routerLink="/login">Voltar para o login</a></p>
+    </div>
+  </div>
+</div>

@@ -4,19 +4,34 @@ import { Observable, tap } from 'rxjs';
 
 export interface LoginResponse {
   token: string;
-  usuario: {
-    id: number;
-    nome: string;
-    email: string;
-    role: 'Admin' | 'Leitor';
-  };
+  nome: string;
+  email: string;
+  perfil: 'Admin' | 'Leitor';
+  expiracao: string;
+}
+
+export interface CadastroRequest {
+  nome: string;
+  email: string;
+  senha: string;
+  telefone: string;
+  rua: string;
+  numero: string;
+  cidade: string;
+  cep: string;
+}
+
+export interface RecuperarSenhaResponse {
+  mensagem: string;
+  canalSimulado: string;
+  conteudoSimulado: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7123/api/auth';
+  private apiUrl = 'https://localhost:7206/api/Auth';
 
   isLoggedIn = signal<boolean>(!!localStorage.getItem('token'));
   isAdmin = signal<boolean>(localStorage.getItem('user_role') === 'Admin');
@@ -26,16 +41,32 @@ export class AuthService {
 
   login(credentials: { email: string; senha: string }): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap((res) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user_role', res.usuario.role);
-        localStorage.setItem('user_name', res.usuario.nome);
-
-        this.isLoggedIn.set(true);
-        this.isAdmin.set(res.usuario.role === 'Admin');
-        this.usuarioAtual.set(res.usuario.nome);
-      })
+      tap((res) => this.aplicarSessao(res))
     );
+  }
+
+  cadastrar(dados: CadastroRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/cadastrar`, dados).pipe(
+      tap((res) => this.aplicarSessao(res))
+    );
+  }
+
+  recuperarSenha(emailOuTelefone: string): Observable<RecuperarSenhaResponse> {
+    return this.http.post<RecuperarSenhaResponse>(`${this.apiUrl}/recuperar-senha`, { emailOuTelefone });
+  }
+
+  alterarSenha(senhaAtual: string, novaSenha: string): Observable<{ mensagem: string }> {
+    return this.http.put<{ mensagem: string }>(`${this.apiUrl}/alterar-senha`, { senhaAtual, novaSenha });
+  }
+
+  private aplicarSessao(res: LoginResponse): void {
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user_role', res.perfil);
+    localStorage.setItem('user_name', res.nome);
+
+    this.isLoggedIn.set(true);
+    this.isAdmin.set(res.perfil === 'Admin');
+    this.usuarioAtual.set(res.nome);
   }
 
   logout(): void {

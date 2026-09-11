@@ -29,8 +29,10 @@ namespace biblibnj.Entities
 
         public DateTime? DataDevolucaoReal { get; set; }
 
+        public int RenovacoesRealizadas { get; set; } = 0;
+
         [Required]
         [MaxLength(20)]
-        public string Status { get; set; } = "EmAberto";
+        public string Status { get; set; } = "Pendente";
     }
 }

@@ -1,0 +1,167 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="brand-header">
+      <div class="brand-icon">📚</div>
+      <h2>Criar Conta</h2>
+      <p>Cadastre-se para consultar e solicitar livros na biblibnj</p>
+    </div>
+
+    <div *ngIf="mensagemErro" class="alert-error">
+      <span>⚠️</span> {{ mensagemErro }}
+    </div>
+
+    <form [formGroup]="cadastroForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="nome">Nome completo</label>
+        <div class="input-icon-wrapper">
+          <span class="icon">👤</span>
+          <input 
+            type="text" 
+            id="nome" 
+            formControlName="nome" 
+            placeholder="Seu nome completo"
+            [class.is-invalid]="f['nome'].invalid && (f['nome'].touched || f['nome'].dirty)"
+          />
+        </div>
+        <div *ngIf="f['nome'].invalid && (f['nome'].touched || f['nome'].dirty)" class="error-feedback">
+          <small *ngIf="f['nome'].errors?.['required']">O nome é obrigatório.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <div class="input-icon-wrapper">
+          <span class="icon">✉️</span>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="seu.email@exemplo.com"
+            [class.is-invalid]="f['email'].invalid && (f['email'].touched || f['email'].dirty)"
+          />
+        </div>
+        <div *ngIf="f['email'].invalid && (f['email'].touched || f['email'].dirty)" class="error-feedback">
+          <small *ngIf="f['email'].errors?.['required']">O e-mail é obrigatório.</small>
+          <small *ngIf="f['email'].errors?.['email']">Digite um endereço de e-mail válido.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <div class="input-icon-wrapper">
+          <span class="icon">🔒</span>
+          <input 
+            [type]="exibirSenha ? 'text' : 'password'" 
+            id="senha" 
+            formControlName="senha" 
+            placeholder="Crie uma senha"
+            [class.is-invalid]="f['senha'].invalid && (f['senha'].touched || f['senha'].dirty)"
+          />
+          <button type="button" (click)="toggleMostrarSenha()" class="btn-toggle-pass">
+            {{ exibirSenha ? '👁️‍🗨️' : '👁️' }}
+          </button>
+        </div>
+        <div *ngIf="f['senha'].invalid && (f['senha'].touched || f['senha'].dirty)" class="error-feedback">
+          <small *ngIf="f['senha'].errors?.['required']">A senha é obrigatória.</small>
+          <small *ngIf="f['senha'].errors?.['minlength']">A senha deve ter no mínimo 6 caracteres.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="telefone">Telefone</label>
+        <div class="input-icon-wrapper">
+          <span class="icon">📱</span>
+          <input 
+            type="tel" 
+            id="telefone" 
+            formControlName="telefone" 
+            placeholder="(41) 99999-9999"
+            [class.is-invalid]="f['telefone'].invalid && (f['telefone'].touched || f['telefone'].dirty)"
+          />
+        </div>
+        <div *ngIf="f['telefone'].invalid && (f['telefone'].touched || f['telefone'].dirty)" class="error-feedback">
+          <small *ngIf="f['telefone'].errors?.['required']">O telefone é obrigatório.</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group grow">
+          <label for="rua">Rua</label>
+          <div class="input-icon-wrapper">
+            <span class="icon">📍</span>
+            <input 
+              type="text" 
+              id="rua" 
+              formControlName="rua" 
+              placeholder="Nome da rua"
+              [class.is-invalid]="f['rua'].invalid && (f['rua'].touched || f['rua'].dirty)"
+            />
+          </div>
+          <div *ngIf="f['rua'].invalid && (f['rua'].touched || f['rua'].dirty)" class="error-feedback">
+            <small *ngIf="f['rua'].errors?.['required']">A rua é obrigatória.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="numero">Número</label>
+          <div class="input-icon-wrapper no-icon">
+            <input 
+              type="text" 
+              id="numero" 
+              formControlName="numero" 
+              placeholder="Nº"
+              [class.is-invalid]="f['numero'].invalid && (f['numero'].touched || f['numero'].dirty)"
+            />
+          </div>
+          <div *ngIf="f['numero'].invalid && (f['numero'].touched || f['numero'].dirty)" class="error-feedback">
+            <small *ngIf="f['numero'].errors?.['required']">Obrigatório.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group grow">
+          <label for="cidade">Cidade</label>
+          <div class="input-icon-wrapper no-icon">
+            <input 
+              type="text" 
+              id="cidade" 
+              formControlName="cidade" 
+              placeholder="Sua cidade"
+              [class.is-invalid]="f['cidade'].invalid && (f['cidade'].touched || f['cidade'].dirty)"
+            />
+          </div>
+          <div *ngIf="f['cidade'].invalid && (f['cidade'].touched || f['cidade'].dirty)" class="error-feedback">
+            <small *ngIf="f['cidade'].errors?.['required']">A cidade é obrigatória.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cep">CEP</label>
+          <div class="input-icon-wrapper no-icon">
+            <input 
+              type="text" 
+              id="cep" 
+              formControlName="cep" 
+              placeholder="00000-000"
+              [class.is-invalid]="f['cep'].invalid && (f['cep'].touched || f['cep'].dirty)"
+            />
+          </div>
+          <div *ngIf="f['cep'].invalid && (f['cep'].touched || f['cep'].dirty)" class="error-feedback">
+            <small *ngIf="f['cep'].errors?.['required']">Obrigatório.</small>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="cadastroForm.invalid || carregando" class="btn-submit">
+        <span *ngIf="!carregando">Criar Conta</span>
+        <span *ngIf="carregando">Cadastrando...</span>
+      </button>
+    </form>
+
+    <div class="card-footer">
+      <p>Já possui uma conta? <a routerLink="/login">Entrar</a></p>
+    </div>
+  </div>
+</div>
+

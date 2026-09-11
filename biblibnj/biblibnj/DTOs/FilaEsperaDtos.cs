@@ -6,6 +6,7 @@ namespace biblibnj.DTOs
     {
         [Required]
         public int LivroId { get; set; }
+
     }
 
     public class PosicaoFilaReadDto
@@ -14,6 +15,7 @@ namespace biblibnj.DTOs
         public string TituloLivro { get; set; } = string.Empty;
         public int Posicao { get; set; }
         public DateTime DataEntrada { get; set; }
+        public int QuantidadeDisponivel { get; set; }
         public string Mensagem { get; set; } = string.Empty;
     }
 }

@@ -1,17 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Livro {
-  id: number;
-  titulo: string;
-  autor: string;
-  isbn: string;
-  quantidadeTotal: number;
-  quantidadeDisponivel: number;
-  categoria: string;
-}
+import { LivroService, LivroReadDto } from '../../../services/livro.service';
+import { AuthService } from '../../../services/auth.service';
+import { EmprestimoService } from '../../../services/emprestimo.service';
+import { FilaEsperaService } from '../../../services/fila-espera.service';
 
 @Component({
   selector: 'app-livro-lista',
@@ -20,24 +14,45 @@ interface Livro {
   templateUrl: './livros-lista.html',
   styleUrl: './livros-lista.css'
 })
-export class LivroListaComponent {
-  isLoggedIn: boolean = true;
-  isAdmin: boolean = false;
+export class LivroListaComponent implements OnInit {
+  // Injeção de dependências
+  private livroService = inject(LivroService);
+  private emprestimoService = inject(EmprestimoService);
+  private filaEsperaService = inject(FilaEsperaService);
+  public authService = inject(AuthService);
+
+  // Estados com Signals
+  livros = signal<LivroReadDto[]>([]);
+  carregando = signal<boolean>(true);
+  erroMsg = signal<string | null>(null);
 
   termoBusca: string = '';
   filtroStatus: 'todos' | 'disponiveis' | 'esgotados' = 'todos';
 
-  livros: Livro[] = [
-    { id: 1, titulo: 'O Hobbit', autor: 'J.R.R. Tolkien', isbn: '978-8595084742', quantidadeTotal: 5, quantidadeDisponivel: 3, categoria: 'Fantasia' },
-    { id: 2, titulo: 'Clean Code', autor: 'Robert C. Martin', isbn: '978-8576082675', quantidadeTotal: 2, quantidadeDisponivel: 1, categoria: 'Tecnologia' },
-    { id: 3, titulo: 'Duna', autor: 'Frank Herbert', isbn: '978-8525056009', quantidadeTotal: 3, quantidadeDisponivel: 0, categoria: 'Ficção Científica' },
-    { id: 4, titulo: '1984', autor: 'George Orwell', isbn: '978-8535909555', quantidadeTotal: 6, quantidadeDisponivel: 5, categoria: 'Distopia' },
-    { id: 5, titulo: 'O Algoritmo Mestre', autor: 'Pedro Domingos', isbn: '978-8575422328', quantidadeTotal: 2, quantidadeDisponivel: 2, categoria: 'Tecnologia' },
-    { id: 6, titulo: 'Dom Casmurro', autor: 'Machado de Assis', isbn: '978-8508123456', quantidadeTotal: 4, quantidadeDisponivel: 0, categoria: 'Clássico' }
-  ];
+  ngOnInit(): void {
+    this.carregarLivros();
+  }
 
-  get livrosFiltrados(): Livro[] {
-    return this.livros.filter(livro => {
+  carregarLivros(): void {
+    this.carregando.set(true);
+    this.erroMsg.set(null);
+
+    this.livroService.obterTodos().subscribe({
+      next: (dados) => {
+        this.livros.set(dados);
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao buscar livros:', err);
+        this.erroMsg.set('Não foi possível conectar com o servidor para buscar o catálogo.');
+        this.carregando.set(false);
+      }
+    });
+  }
+
+  // Corrigido para utilizar LivroReadDto e a propriedade quantidadeDisponivel
+  get livrosFiltrados(): LivroReadDto[] {
+    return this.livros().filter(livro => {
       const termo = this.termoBusca.toLowerCase().trim();
       const combinaTermo = !termo || 
         livro.titulo.toLowerCase().includes(termo) ||
@@ -55,17 +70,35 @@ export class LivroListaComponent {
     });
   }
 
-  solicitarEmprestimo(livro: Livro): void {
-    alert(`Solicitação de empréstimo para o livro "${livro.titulo}" realizada!`);
+  solicitarEmprestimo(livro: LivroReadDto): void {
+    this.emprestimoService.solicitarEmprestimo(livro.id).subscribe({
+      next: () => {
+        alert(`Solicitação de empréstimo para "${livro.titulo}" realizada com sucesso!`);
+        this.carregarLivros();
+      },
+      error: (err) => alert(err.error?.mensagem || 'Erro ao solicitar empréstimo.')
+    });
   }
 
-  entrarNaFila(livro: Livro): void {
-    alert(`Você entrou na fila de espera para o livro "${livro.titulo}".`);
+  // Corrigido para chamar o FilaEsperaService
+  entrarNaFila(livro: LivroReadDto): void {
+    this.filaEsperaService.entrarNaFila(livro.id).subscribe({
+      next: (res) => {
+        alert(res.mensagem || `Você entrou na fila de espera para "${livro.titulo}".`);
+      },
+      error: (err) => alert(err.error?.mensagem || 'Erro ao entrar na fila de espera.')
+    });
   }
 
-  excluirLivro(id: number): void {
-    if (confirm('Tem certeza que deseja remover este livro do acervo?')) {
-      this.livros = this.livros.filter(l => l.id !== id);
+  excluirLivro(id: number, titulo: string): void {
+    if (confirm(`Tem certeza que deseja remover "${titulo}" do acervo?`)) {
+      this.livroService.excluir(id).subscribe({
+        next: (res) => {
+          alert(res.mensagem || 'Livro removido com sucesso.');
+          this.carregarLivros();
+        },
+        error: (err) => alert(err.error?.mensagem || 'Erro ao excluir o livro.')
+      });
     }
   }
 }
