@@ -31,7 +31,7 @@ export interface RecuperarSenhaResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7206/api/Auth';
+  private apiUrl = 'https://biblibnj-api-gud0h2fjgccpc2c3.brazilsouth-01.azurewebsites.net/api/Auth';
 
   isLoggedIn = signal<boolean>(!!localStorage.getItem('token'));
   isAdmin = signal<boolean>(localStorage.getItem('user_role') === 'Admin');

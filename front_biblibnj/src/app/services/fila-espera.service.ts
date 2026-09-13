@@ -15,7 +15,7 @@ export interface PosicaoFilaReadDto {
   providedIn: 'root'
 })
 export class FilaEsperaService {
-  private apiUrl = 'https://localhost:7206/api/filaespera';
+  private apiUrl = 'https://biblibnj-api-gud0h2fjgccpc2c3.brazilsouth-01.azurewebsites.net/api/filaespera';
 
   constructor(private http: HttpClient) {}
 

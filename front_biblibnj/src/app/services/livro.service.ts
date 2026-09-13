@@ -37,7 +37,7 @@ export interface AjusteEstoqueDto {
   providedIn: 'root'
 })
 export class LivroService {
-  private apiUrl = 'https://localhost:7206/api/livros';
+  private apiUrl = 'https://biblibnj-api-gud0h2fjgccpc2c3.brazilsouth-01.azurewebsites.net/api/livros';
 
   constructor(private http: HttpClient) {}
 

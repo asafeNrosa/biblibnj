@@ -33,7 +33,7 @@ export interface UsuarioComMultaDto {
   providedIn: 'root'
 })
 export class EmprestimoService {
-  private apiUrl = 'https://localhost:7206/api/emprestimos';
+  private apiUrl = 'https://biblibnj-api-gud0h2fjgccpc2c3.brazilsouth-01.azurewebsites.net/api/emprestimos';
 
   constructor(private http: HttpClient) {}
 
