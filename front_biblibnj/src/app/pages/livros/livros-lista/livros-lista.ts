@@ -50,7 +50,6 @@ export class LivroListaComponent implements OnInit {
     });
   }
 
-  // Corrigido para utilizar LivroReadDto e a propriedade quantidadeDisponivel
   get livrosFiltrados(): LivroReadDto[] {
     return this.livros().filter(livro => {
       const termo = this.termoBusca.toLowerCase().trim();
@@ -76,17 +75,28 @@ export class LivroListaComponent implements OnInit {
         alert(`Solicitação de empréstimo para "${livro.titulo}" realizada com sucesso!`);
         this.carregarLivros();
       },
-      error: (err) => alert(err.error?.mensagem || 'Erro ao solicitar empréstimo.')
+      error: (err) => {
+  if (err.status === 401) {
+    alert('Efetue login para realizar empréstimos.');
+    return;
+  }
+  alert(err.error?.mensagem || 'Erro ao solicitar empréstimo.');
+}
     });
   }
 
-  // Corrigido para chamar o FilaEsperaService
   entrarNaFila(livro: LivroReadDto): void {
     this.filaEsperaService.entrarNaFila(livro.id).subscribe({
       next: (res) => {
         alert(res.mensagem || `Você entrou na fila de espera para "${livro.titulo}".`);
       },
-      error: (err) => alert(err.error?.mensagem || 'Erro ao entrar na fila de espera.')
+      error: (err) => {
+  if (err.status === 401) {
+    alert('Efetue login para entrar na fila de espera.');
+    return;
+  }
+  alert(err.error?.mensagem || 'Erro ao entrar na fila de espera.');
+}
     });
   }
 
