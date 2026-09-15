@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EmprestimoService, EmprestimoReadDto, UsuarioComMultaDto } from '../../../services/emprestimo.service';
+import { FilaEsperaService, PosicaoFilaReadDto } from '../../../services/fila-espera.service';
 
 @Component({
   selector: 'app-gerenciar-emprestimos',
@@ -11,12 +12,14 @@ import { EmprestimoService, EmprestimoReadDto, UsuarioComMultaDto } from '../../
 })
 export class GerenciarEmprestimos implements OnInit {
   private emprestimoService = inject(EmprestimoService);
+  private filaEsperaService = inject(FilaEsperaService);
 
-  abaAtiva = signal<'pendentes' | 'ativos' | 'multas'>('pendentes');
+  abaAtiva = signal<'pendentes' | 'ativos' | 'multas' | 'fila'>('pendentes');
 
   pendentes = signal<EmprestimoReadDto[]>([]);
   ativos = signal<EmprestimoReadDto[]>([]);
   usuariosComMulta = signal<UsuarioComMultaDto[]>([]);
+  filasDeEspera = signal<PosicaoFilaReadDto[]>([]);
 
   carregando = signal<boolean>(true);
   erroMsg = signal<string | null>(null);
@@ -44,6 +47,27 @@ export class GerenciarEmprestimos implements OnInit {
 
     this.emprestimoService.obterUsuariosComMulta().subscribe({
       next: (dados) => this.usuariosComMulta.set(dados)
+    });
+
+    this.filaEsperaService.obterTodasAsFilas().subscribe({
+      next: (dados) => this.filasDeEspera.set(dados)
+    });
+  }
+
+  podeAutorizar(fila: PosicaoFilaReadDto): boolean {
+    return fila.posicao === 1 && fila.quantidadeDisponivel > 0;
+  }
+
+  autorizar(fila: PosicaoFilaReadDto): void {
+    if (!confirm(`Autorizar o empréstimo de "${fila.tituloLivro}" para ${fila.nomeUsuario}?`)) {
+      return;
+    }
+    this.filaEsperaService.autorizar(fila.id).subscribe({
+      next: (res) => {
+        alert(res.mensagem);
+        this.carregarTudo();
+      },
+      error: (err) => alert(err.error?.mensagem || 'Erro ao autorizar o empréstimo.')
     });
   }
 

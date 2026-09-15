@@ -80,6 +80,7 @@ namespace biblibnj.Controllers
 
             return Ok(new PosicaoFilaReadDto
             {
+                Id = novaEntrada.Id,
                 LivroId = livro.Id,
                 TituloLivro = livro.Titulo,
                 Posicao = posicao,
@@ -110,6 +111,7 @@ namespace biblibnj.Controllers
 
             return Ok(new PosicaoFilaReadDto
             {
+                Id = registroFila.Id,
                 LivroId = registroFila.LivroId,
                 TituloLivro = registroFila.Livro?.Titulo ?? string.Empty,
                 Posicao = posicao,
@@ -119,17 +121,17 @@ namespace biblibnj.Controllers
             });
         }
 
-        // 1. Obter todas as filas em que o usuário atual está inserido
         [HttpGet("minhas")]
         public async Task<IActionResult> ObterMinhasFilas()
         {
-            var usuarioId = ObterUsuarioId(); // Método auxiliar para extrair do Token JWT
+            var usuarioId = ObterUsuarioId();
 
             var filas = await _context.FilaEspera
                 .Include(f => f.Livro)
                 .Where(f => f.UsuarioId == usuarioId)
                 .Select(f => new PosicaoFilaReadDto
                 {
+                    Id = f.Id,
                     LivroId = f.LivroId,
                     TituloLivro = f.Livro != null ? f.Livro.Titulo : string.Empty,
                     Posicao = f.Posicao,
@@ -142,7 +144,109 @@ namespace biblibnj.Controllers
             return Ok(filas);
         }
 
-        // 2. Remover o usuário da fila de espera
+        // Visão administrativa: todas as filas de espera de todos os usuários,
+        // para o admin saber quem autorizar assim que um livro fica disponível.
+        [HttpGet("todas")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ObterTodasAsFilas()
+        {
+            var filas = await _context.FilaEspera
+                .Include(f => f.Livro)
+                .Include(f => f.Usuario)
+                .OrderBy(f => f.LivroId).ThenBy(f => f.Posicao)
+                .Select(f => new PosicaoFilaReadDto
+                {
+                    Id = f.Id,
+                    LivroId = f.LivroId,
+                    TituloLivro = f.Livro != null ? f.Livro.Titulo : string.Empty,
+                    UsuarioId = f.UsuarioId,
+                    NomeUsuario = f.Usuario != null ? f.Usuario.Nome : string.Empty,
+                    EmailUsuario = f.Usuario != null ? f.Usuario.Email : string.Empty,
+                    Posicao = f.Posicao,
+                    DataEntrada = f.DataEntrada,
+                    QuantidadeDisponivel = f.Livro != null ? f.Livro.QuantidadeDisponivel : 0,
+                    Mensagem = $"Posição {f.Posicao} na fila."
+                })
+                .ToListAsync();
+
+            return Ok(filas);
+        }
+
+        // Admin autoriza diretamente o empréstimo de quem está na vez da fila,
+        // sem precisar que o próprio leitor clique em "Solicitar Empréstimo".
+        // Já cria o empréstimo liberado (EmAberto), pulando a etapa de aprovação,
+        // já que é o próprio admin que está autorizando aqui.
+        [HttpPost("autorizar")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AutorizarDaFila([FromBody] AutorizarFilaDto dto)
+        {
+            var registroFila = await _context.FilaEspera
+                .Include(f => f.Livro)
+                .Include(f => f.Usuario)
+                .FirstOrDefaultAsync(f => f.Id == dto.FilaEsperaId);
+
+            if (registroFila == null)
+            {
+                return NotFound(new { mensagem = "Registro de fila de espera não encontrado." });
+            }
+
+            if (registroFila.Livro == null || registroFila.Usuario == null)
+            {
+                return BadRequest(new { mensagem = "Dados de livro ou usuário inconsistentes para esta fila." });
+            }
+
+            if (registroFila.Posicao != 1)
+            {
+                return BadRequest(new { mensagem = "Só é possível autorizar quem está na posição 1 da fila." });
+            }
+
+            if (registroFila.Livro.QuantidadeDisponivel <= 0)
+            {
+                return BadRequest(new { mensagem = "Não há exemplares disponíveis deste livro no momento." });
+            }
+
+            if (registroFila.Usuario.MultaPendente > 0)
+            {
+                return BadRequest(new { mensagem = $"{registroFila.Usuario.Nome} possui multa pendente e não pode receber novo empréstimo até regularizar." });
+            }
+
+            var possuiEmprestimoAtivo = await _context.Emprestimos
+                .AnyAsync(e => e.UsuarioId == registroFila.UsuarioId &&
+                              (e.Status == "Pendente" || e.Status == "EmAberto" || e.Status == "Atrasado"));
+
+            if (possuiEmprestimoAtivo)
+            {
+                return BadRequest(new { mensagem = $"{registroFila.Usuario.Nome} já possui um empréstimo em andamento." });
+            }
+
+            registroFila.Livro.QuantidadeDisponivel -= 1;
+
+            var novoEmprestimo = new Emprestimo
+            {
+                UsuarioId = registroFila.UsuarioId,
+                LivroId = registroFila.LivroId,
+                DataEmprestimo = DateTime.Now,
+                DataDevolucaoPrevista = DateTime.Now.AddDays(7),
+                Status = "EmAberto"
+            };
+            _context.Emprestimos.Add(novoEmprestimo);
+
+            _context.FilaEspera.Remove(registroFila);
+
+            var filaRestante = await _context.FilaEspera
+                .Where(f => f.LivroId == registroFila.LivroId && f.Posicao > registroFila.Posicao)
+                .ToListAsync();
+
+            foreach (var item in filaRestante)
+            {
+                item.Posicao--;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { mensagem = $"Empréstimo autorizado para {registroFila.Usuario.Nome}." });
+        }
+
         [HttpDelete("sair/{livroId}")]
         public async Task<IActionResult> SairDaFila(int livroId)
         {
@@ -159,7 +263,6 @@ namespace biblibnj.Controllers
             _context.FilaEspera.Remove(registroFila);
             await _context.SaveChangesAsync();
 
-            // Reordena as posições dos leitores restantes na fila do mesmo livro
             var filaRestante = await _context.FilaEspera
                 .Where(f => f.LivroId == livroId && f.Posicao > registroFila.Posicao)
                 .ToListAsync();
@@ -173,6 +276,5 @@ namespace biblibnj.Controllers
 
             return Ok(new { mensagem = "Você saiu da fila de espera com sucesso." });
         }
-
     }
 }

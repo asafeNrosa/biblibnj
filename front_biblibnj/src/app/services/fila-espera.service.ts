@@ -1,10 +1,15 @@
+// fila-espera.service.ts - Serviço dedicado para o FilaEsperaController
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface PosicaoFilaReadDto {
+  id: number;
   livroId: number;
   tituloLivro: string;
+  usuarioId: number;
+  nomeUsuario: string;
+  emailUsuario: string;
   posicao: number;
   dataEntrada: string;
   quantidadeDisponivel: number;
@@ -27,16 +32,19 @@ export class FilaEsperaService {
     return this.http.get<PosicaoFilaReadDto>(`${this.apiUrl}/posicao/${livroId}`);
   }
 
-    obterMinhasFilas(): Observable<PosicaoFilaReadDto[]> {
-
+  obterMinhasFilas(): Observable<PosicaoFilaReadDto[]> {
     return this.http.get<PosicaoFilaReadDto[]>(`${this.apiUrl}/minhas`);
+  }
 
+  obterTodasAsFilas(): Observable<PosicaoFilaReadDto[]> {
+    return this.http.get<PosicaoFilaReadDto[]>(`${this.apiUrl}/todas`);
+  }
+
+  autorizar(filaEsperaId: number): Observable<{ mensagem: string }> {
+    return this.http.post<{ mensagem: string }>(`${this.apiUrl}/autorizar`, { filaEsperaId });
   }
 
   sairDaFila(livroId: number): Observable<{ mensagem: string }> {
-
     return this.http.delete<{ mensagem: string }>(`${this.apiUrl}/sair/${livroId}`);
-
   }
-
 }

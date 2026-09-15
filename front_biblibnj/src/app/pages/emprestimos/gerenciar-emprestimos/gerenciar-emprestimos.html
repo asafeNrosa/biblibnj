@@ -16,6 +16,9 @@
     <button [class.active]="abaAtiva() === 'multas'" (click)="abaAtiva.set('multas')">
       Usuários com Multa ({{ usuariosComMulta().length }})
     </button>
+    <button [class.active]="abaAtiva() === 'fila'" (click)="abaAtiva.set('fila')">
+      Fila de Espera ({{ filasDeEspera().length }})
+    </button>
   </div>
 
   <div *ngIf="carregando()" class="loading-state">
@@ -119,6 +122,49 @@
           <td class="multa-valor">R$ {{ u.multaPendente.toFixed(2) }}</td>
           <td class="col-actions">
             <button class="btn-approve" (click)="liberarUsuario(u.id, u.nome)">Liberar (multa paga)</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ABA: Fila de Espera -->
+  <div *ngIf="!carregando() && abaAtiva() === 'fila'">
+    <div *ngIf="filasDeEspera().length === 0" class="empty-state">
+      <p>Nenhum usuário em fila de espera no momento.</p>
+    </div>
+
+    <table *ngIf="filasDeEspera().length > 0" class="manage-table">
+      <thead>
+        <tr>
+          <th>Livro</th>
+          <th>Posição</th>
+          <th>Usuário</th>
+          <th>Entrou em</th>
+          <th>Exemplares disponíveis</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of filasDeEspera()">
+          <td>{{ f.tituloLivro }}</td>
+          <td>#{{ f.posicao }}</td>
+          <td>
+            <strong>{{ f.nomeUsuario }}</strong>
+            <small>{{ f.emailUsuario }}</small>
+          </td>
+          <td>{{ f.dataEntrada | date:'dd/MM/yyyy' }}</td>
+          <td>{{ f.quantidadeDisponivel }}</td>
+          <td class="col-actions">
+            <button
+              *ngIf="podeAutorizar(f)"
+              class="btn-approve"
+              (click)="autorizar(f)">
+              Autorizar Empréstimo
+            </button>
+            <small *ngIf="!podeAutorizar(f)" class="multa-hint" style="color:#94a3b8;">
+              {{ f.posicao > 1 ? 'Aguardando a vez' : 'Sem exemplar disponível' }}
+            </small>
           </td>
         </tr>
       </tbody>
